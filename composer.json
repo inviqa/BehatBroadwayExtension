@@ -1,0 +1,19 @@
+{
+    "name": "inviqa/behat-broadway-extension",
+    "type": "library",
+    "keywords": ["behat", "broadway"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.0",
+        "behat/behat": "~3.0.4",
+        "broadway/broadway": "~0.2.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "": "src/", "Inviqa\\BehatBroadwayExtension": "src/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}

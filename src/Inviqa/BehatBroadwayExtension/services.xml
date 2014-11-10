@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="inviqa.broadway_extension.broadway" class="Inviqa\BehatBroadwayExtension\BroadwayProvider" />
+
+        <service id="inviqa.broadway_extension.broadway_initializer" class="Inviqa\BehatBroadwayExtension\Context\BroadwayAwareInitializer">
+            <argument id="inviqa.broadway_extension.broadway" type="service"/>
+            <tag name="context.initializer" prority="0"/>
+            <tag name="event_dispatcher.subscriber" prority="0"/>
+        </service>
+
+    </services>
+</container>
