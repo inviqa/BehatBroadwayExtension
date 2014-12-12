@@ -16,7 +16,7 @@ class BroadwayProvider
     private $store;
     private $eventBus;
     private $commandBus;
-    private $playhead;
+    private $playheads;
     private $readRepositories;
 
     public function __construct()
@@ -29,7 +29,7 @@ class BroadwayProvider
         $this->store = new TraceableEventStore(new InMemoryEventStore());
         $this->eventBus = new SimpleEventBus();
         $this->commandBus = new SimpleCommandBus();
-        $this->playhead = -1;
+        $this->playheads = [];
         $this->readRepositories = [];
     }
 
@@ -38,9 +38,22 @@ class BroadwayProvider
         $this->eventBus->subscribe($projector);
     }
 
+    public function addCommandHandler($handler)
+    {
+        $this->commandBus->subscribe($handler);
+    }
+
     public function assertEventsOccurred($events)
     {
         assert($this->store->getEvents() == $events);
+    }
+
+    public function assertEventsOccurredInterAlia($events)
+    {
+        foreach($events as $event) {
+            assert(in_array($event, $this->store->getEvents()));
+        }
+
     }
 
     public function dispatchCommand($commandHandler, $command)
@@ -54,11 +67,15 @@ class BroadwayProvider
     {
         $messages = array();
         foreach ($events as $event) {
-            $this->playhead++;
-            $messages[] = DomainMessage::recordNow($id, $this->playhead, new Metadata(array()), $event);
+            $playhead = $this->getPlayhead($id);
+            $playhead++;
+            $messages[] = DomainMessage::recordNow($id, $playhead, new Metadata(array()), $event);
+            $this->playheads[$id] = $playhead;
         }
 
-        $this->store->append($id, new DomainEventStream($messages));
+        $domainEventStream = new DomainEventStream($messages);
+        $this->store->append($id, $domainEventStream);
+        $this->eventBus->publish($domainEventStream);
     }
 
     /**
@@ -84,5 +101,15 @@ class BroadwayProvider
         }
 
         return $this->readRepositories[$name];
+    }
+
+    public function getCommandBus()
+    {
+        return $this->commandBus;
+    }
+
+    private function getPlayhead($id)
+    {
+        return isset($this->playheads[$id]) ? $this->playheads[$id] : -1;
     }
 }
