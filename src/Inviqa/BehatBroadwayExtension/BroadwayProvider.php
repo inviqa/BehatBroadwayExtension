@@ -56,10 +56,14 @@ class BroadwayProvider
 
     }
 
-    public function dispatchCommand($commandHandler, $command)
+    public function dispatchCommand($commandHandler, $command, $extraHandlers = [])
     {
         $this->store->trace();
         $this->commandBus->subscribe($commandHandler);
+
+        foreach ($extraHandlers as $extraHandler) {
+            $this->commandBus->subscribe($extraHandler);
+        }
         $this->commandBus->dispatch($command);
     }
 
