@@ -50,10 +50,18 @@ class BroadwayProvider
 
     public function assertEventsOccurredInterAlia($events)
     {
-        foreach($events as $event) {
+        foreach ($events as $event) {
             assert(in_array($event, $this->store->getEvents()));
         }
+    }
 
+    public function assertEventsOccurredLax($events)
+    {
+        $eventClasses = array_map('get_class', $this->store->getEvents());
+
+        foreach ($events as $event) {
+            assert(in_array(get_class($event), $eventClasses));
+        }
     }
 
     public function dispatchCommand($commandHandler, $command, $extraHandlers = [])
